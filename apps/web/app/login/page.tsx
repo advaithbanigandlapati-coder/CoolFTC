@@ -1,28 +1,26 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const supabase = useMemo(() => createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  ), []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true); setError("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError(error.message); setLoading(false); return; }
-    router.refresh();
-    router.push("/app");
+    // Hard redirect — guarantees Next.js middleware re-reads the auth cookie from scratch
+    window.location.href = "/app";
   }
 
   return (
