@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-        setAll: (cookies) =>
+        setAll: (cookies: { name: string; value: string; options?: Record<string, unknown> }[]) =>
           cookies.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
           ),
@@ -18,8 +18,6 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // getSession() reads directly from the cookie — no network call, never returns
-  // null just because Supabase's auth server is slow or unreachable in Edge runtime
   const { data: { session } } = await supabase.auth.getSession();
 
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
