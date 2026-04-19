@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Middleware only refreshes the Supabase session cookie — it does NOT redirect.
+// Auth-based redirects are handled client-side in app/app/layout.tsx where the
+// cookie is always readable. Doing redirects here causes a race condition on
+// Edge Runtime where the cookie set by createBrowserClient isn't visible yet.
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -18,14 +22,9 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
-
-  const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
-                      request.nextUrl.pathname.startsWith("/signup");
-  const isAppRoute  = request.nextUrl.pathname.startsWith("/app");
-
-  if (!session && isAppRoute)  return NextResponse.redirect(new URL("/login", request.url));
-  if (session  && isAuthRoute) return NextResponse.redirect(new URL("/app",   request.url));
+  // This refreshes the session if expired — required for Server Components to work.
+  // We intentionally ignore the result; redirects are handled in the layout.
+  await supabase.auth.getSession();
 
   return response;
 }
