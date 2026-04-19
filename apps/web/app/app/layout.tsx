@@ -35,12 +35,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   ), []);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) { router.replace("/login"); return; }
-      setUser({ display_name: data.user.user_metadata?.display_name ?? data.user.email });
+    // getSession() reads the cookie locally — no network call, never silently fails.
+    // Middleware already guards this route so no redirect needed here.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser({ display_name: session.user.user_metadata?.display_name ?? session.user.email });
+      }
       setAuthReady(true);
     });
-  }, [router, supabase]);
+  }, [supabase]);
 
   async function signOut() {
     await supabase.auth.signOut();
