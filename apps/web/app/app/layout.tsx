@@ -35,12 +35,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   ), []);
 
   useEffect(() => {
-    // getSession() reads the cookie locally — no network call, never silently fails.
-    // Middleware already guards this route so no redirect needed here.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser({ display_name: session.user.user_metadata?.display_name ?? session.user.email });
+      if (!session) {
+        // No session client-side — send to login. This is the authoritative auth check.
+        window.location.href = "/login";
+        return;
       }
+      setUser({ display_name: session.user.user_metadata?.display_name ?? session.user.email });
       setAuthReady(true);
     });
   }, [supabase]);
