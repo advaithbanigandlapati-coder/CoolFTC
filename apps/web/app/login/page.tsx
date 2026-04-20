@@ -21,7 +21,9 @@ export default function LoginPage() {
     setLoading(true); setError("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError(error.message); setLoading(false); return; }
-    router.push("/app");
+    // Hard navigation (not router.push) — gives middleware a fresh request
+    // with the auth cookies properly set, avoiding the RSC cache race.
+    window.location.href = "/app";
   }
 
   return (
