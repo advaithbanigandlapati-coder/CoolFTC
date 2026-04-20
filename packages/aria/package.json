@@ -1,0 +1,31 @@
+{
+  "name": "@coolfTC/aria",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".":                     "./src/index.ts",
+    "./rateLimiter":         "./src/rateLimiter.ts",
+    "./rag":                 "./src/rag.ts",
+    "./tools":               "./src/tools.ts",
+    "./memory":              "./src/memory.ts",
+    "./assembler":           "./src/assembler.ts",
+    "./client":              "./src/client.ts",
+    "./byokCrypto":          "./src/byokCrypto.ts",
+    "./prompts/systemBase":  "./src/prompts/systemBase.ts",
+    "./prompts/changelogPrompt": "./src/prompts/changelogPrompt.ts",
+    "./prompts/alliancePick":    "./src/prompts/alliancePick.ts",
+    "./prompts/counterStrategy": "./src/prompts/counterStrategy.ts",
+    "./prompts/matchPreview":    "./src/prompts/matchPreview.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0",
+    "openai": "^4.52.0",
+    "@coolfTC/types": "*",
+    "@coolfTC/db": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
