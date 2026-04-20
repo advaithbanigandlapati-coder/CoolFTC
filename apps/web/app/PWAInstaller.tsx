@@ -6,6 +6,9 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+// Bump this on any SW change. Recovery key stored in localStorage.
+const SW_EXPECTED_VERSION = "coolftc-v3";
+
 export default function PWAInstaller() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -14,50 +17,72 @@ export default function PWAInstaller() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // ─── Service worker: register + handle silent updates ─────────────
-    if ("serviceWorker" in navigator) {
-      let reloading = false;
+    // ─── SELF-HEAL: kill old broken service workers ─────────────────
+    // Older versions (v1, v2) incorrectly intercepted navigation requests
+    // which broke auth. If we detect any old SW, unregister it + purge caches.
+    (async () => {
+      if (!("serviceWorker" in navigator)) return;
 
-      // When the controller changes (new SW took over), reload silently
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (reloading) return;
-        reloading = true;
-        // Defer so any in-flight API calls have a chance to complete
-        setTimeout(() => window.location.reload(), 100);
-      });
+      try {
+        // Get all caches — if any are from old versions, we have a stale SW
+        const cacheKeys = await caches.keys();
+        const hasOldCache = cacheKeys.some(
+          (k) => k.startsWith("coolftc-") && !k.startsWith(SW_EXPECTED_VERSION)
+        );
 
-      // SW broadcasts SW_UPDATED after activate — same effect, redundant safety
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        if (event.data?.type === "SW_UPDATED" && !reloading) {
-          reloading = true;
-          setTimeout(() => window.location.reload(), 100);
+        // Get all SW registrations
+        const registrations = await navigator.serviceWorker.getRegistrations();
+
+        // If there are old caches OR any waiting workers we couldn't activate,
+        // nuke everything and reload. The fresh SW registration below will
+        // install the good v3.
+        if (hasOldCache) {
+          await Promise.all(cacheKeys.map((k) => caches.delete(k)));
+          await Promise.all(registrations.map((r) => r.unregister()));
+          // Mark that we did a heal so we don't loop
+          const healed = sessionStorage.getItem("coolftc-sw-healed");
+          if (!healed) {
+            sessionStorage.setItem("coolftc-sw-healed", "1");
+            window.location.reload();
+            return;
+          }
         }
-      });
 
-      navigator.serviceWorker.register("/sw.js").then((reg) => {
-        // Check for updates whenever the page becomes visible
-        const checkForUpdate = () => reg.update().catch(() => { /* ignore */ });
+        // Normal path: register the fresh SW
+        const reg = await navigator.serviceWorker.register("/sw.js");
+
+        // Check for updates when tab becomes visible
+        const checkForUpdate = () => reg.update().catch(() => {});
         document.addEventListener("visibilitychange", () => {
           if (document.visibilityState === "visible") checkForUpdate();
         });
-        // Also poll every 30 min for long-open tabs
+        // Poll every 30 min for long-open tabs
         setInterval(checkForUpdate, 30 * 60 * 1000);
 
-        // If a waiting worker exists right now, activate it
+        // Auto-activate new waiting workers
         reg.addEventListener("updatefound", () => {
           const newWorker = reg.installing;
           if (!newWorker) return;
           newWorker.addEventListener("statechange", () => {
             if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              // New SW ready → tell it to skip waiting; controllerchange handler reloads
               newWorker.postMessage({ type: "SKIP_WAITING" });
             }
           });
         });
-      }).catch(() => { /* ignore registration errors */ });
-    }
 
-    // ─── PWA install prompt ───────────────────────────────────────────
+        // When a new SW takes over, reload once (silently) to use its caching
+        let reloading = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (reloading) return;
+          reloading = true;
+          setTimeout(() => window.location.reload(), 100);
+        });
+      } catch {
+        // Any SW error is silent — the site works fine without a SW
+      }
+    })();
+
+    // ─── PWA install prompt ──────────────────────────────────────────
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setInstalled(true);
       return;
