@@ -33,7 +33,7 @@ export default function SignupPage() {
       name: form.orgName, ftc_team_number: form.teamNumber || null,
       slug: `${slug}-${Date.now()}`, created_by: data.user.id,
     });
-    router.push("/app");
+    window.location.href = "/app";
   }
 
   return (
