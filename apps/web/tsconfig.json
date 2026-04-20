@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"],
+      "@coolfTC/types": ["../../packages/types/src/index.ts"],
+      "@coolfTC/db": ["../../packages/db/src/index.ts"],
+      "@coolfTC/aria": ["../../packages/aria/src/index.ts"],
+      "@coolfTC/aria/*": ["../../packages/aria/src/*"],
+      "@coolfTC/ftc-api": ["../../packages/ftc-api/src/index.ts"],
+      "@coolfTC/ui": ["../../packages/ui/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", ".next"]
+}

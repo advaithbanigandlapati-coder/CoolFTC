@@ -1,0 +1,49 @@
+{
+  "name": "CoolFTC — FTC Intelligence Platform",
+  "short_name": "CoolFTC",
+  "description": "Real-time scouting, analytics, and strategic intelligence for FTC teams. By Team #30439.",
+  "start_url": "/app",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0f",
+  "theme_color": "#FF5A1F",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scout a match",
+      "url": "/app/scout",
+      "description": "Jump straight to the scouting form"
+    },
+    {
+      "name": "Ask ARIA",
+      "url": "/app/aria",
+      "description": "Strategic assistant"
+    },
+    {
+      "name": "Live Intel",
+      "url": "/app/live",
+      "description": "What's happening at the event right now"
+    }
+  ],
+  "categories": ["sports", "productivity", "utilities"],
+  "prefer_related_applications": false
+}
