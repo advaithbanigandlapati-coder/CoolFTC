@@ -14,7 +14,7 @@
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "@supabase/supabase-js": "^2.43.0",
-    "@supabase/ssr": "^0.3.0",
+    "@supabase/ssr": "^0.6.1",
     "@anthropic-ai/sdk": "^0.40.0",
     "@coolfTC/types": "*",
     "@coolfTC/db": "*",
