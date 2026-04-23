@@ -457,8 +457,9 @@ export async function searchTeams(query: string, limit = 25): Promise<TeamSearch
   if (!q) return [];
   try {
     // Use the confirmed FTCScout REST endpoint for team search
-    // Docs: GET /teams/search?searchText=...&limit=...
-    const url = new URL("/teams/search", FTCSCOUT_REST);
+    // Docs: GET /rest/v1/teams/search?searchText=...&limit=...
+    // NOTE: must NOT use new URL("/path", base) with leading slash — it strips the base path.
+    const url = new URL(`${FTCSCOUT_REST}/teams/search`);
     url.searchParams.set("searchText", q);
     url.searchParams.set("limit", String(limit));
     const res = await fetch(url.toString(), {
@@ -494,7 +495,8 @@ export type EventSearchResult = {
 export async function searchEvents(query:string, season?:number, limit=15): Promise<EventSearchResult[]> {
   const q = query.trim(); if (!q) return [];
   try {
-    const url = new URL("/events/search", "https://api.ftcscout.org/rest/v1");
+    // NOTE: must NOT use new URL("/path", base) with leading slash — it strips the base path.
+    const url = new URL(`${FTCSCOUT_REST}/events/search`);
     url.searchParams.set("searchText", q);
     url.searchParams.set("limit", String(limit));
     const res = await fetch(url.toString());
