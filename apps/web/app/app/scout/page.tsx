@@ -255,8 +255,9 @@ export default function ScoutPage() {
               </div>
             </div>
             <svg
-              viewBox="0 0 360 240"
+              viewBox="0 0 360 360"
               className="w-full rounded border border-white/[0.065] bg-[#0F0F17] cursor-crosshair touch-none"
+              style={{ aspectRatio: "1 / 1" }}
               onClick={(e) => {
                 const rect = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
                 const x = (e.clientX - rect.left) / rect.width;
@@ -266,21 +267,21 @@ export default function ScoutPage() {
               role="img"
               aria-label="FTC field diagram. Tap to add position markers."
             >
-              {/* Real field image background */}
-              <image href="/field.jpg" x="0" y="0" width="360" height="240" preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.65 }} />
+              {/* Real field image background — full square to match FTC field */}
+              <image href="/field.jpg" x="0" y="0" width="360" height="360" preserveAspectRatio="xMidYMid meet" style={{ opacity: 0.65 }} />
               {/* Dark overlay for contrast */}
-              <rect x="0" y="0" width="360" height="240" fill="rgba(0,0,0,0.35)" />
+              <rect x="0" y="0" width="360" height="360" fill="rgba(0,0,0,0.35)" />
               {/* Phase labels */}
               <text x="12" y="18" fill="rgba(255,255,255,0.5)" fontFamily="DM Mono" fontSize="8">AUDIENCE</text>
               <text x="300" y="18" fill="rgba(255,255,255,0.5)" fontFamily="DM Mono" fontSize="8">FAR SIDE</text>
-              <text x="12" y="232" fill="rgba(255,255,255,0.5)" fontFamily="DM Mono" fontSize="8">RED</text>
-              <text x="320" y="232" fill="rgba(255,255,255,0.5)" fontFamily="DM Mono" fontSize="8">BLUE</text>
+              <text x="12" y="352" fill="rgba(255,255,255,0.5)" fontFamily="DM Mono" fontSize="8">RED</text>
+              <text x="320" y="352" fill="rgba(255,255,255,0.5)" fontFamily="DM Mono" fontSize="8">BLUE</text>
               {/* Tap markers */}
               {fieldPositions.map((p, i) => (
                 <circle
                   key={i}
                   cx={p.x * 360}
-                  cy={p.y * 240}
+                  cy={p.y * 360}
                   r={6}
                   fill={p.phase === "auto" ? "#5B9CF4" : p.phase === "endgame" ? "#FF5A1F" : "#2DD88A"}
                   fillOpacity={0.75}
