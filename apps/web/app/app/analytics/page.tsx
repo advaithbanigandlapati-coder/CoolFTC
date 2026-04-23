@@ -14,7 +14,7 @@ type StatRow = { team_number: string; opr: number | null; rank: number | null; w
 type ScoutEntry = { team_number: string; tier: string | null; form_data: Record<string, unknown>; field_positions: { x: number; y: number; phase?: string }[] | null };
 type Tab = "radar" | "timeline" | "compat" | "heatmap" | "rankings" | "h2h";
 
-const HEATMAP_W = 380; const HEATMAP_H = 260; const GRID = 16;
+const HEATMAP_W = 360; const HEATMAP_H = 360; const GRID = 16;
 
 function heatColor(d: number, max: number) {
   const t = max > 0 ? d / max : 0;
